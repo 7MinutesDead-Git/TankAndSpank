@@ -21,6 +21,7 @@ public:
 private:
 	// "AllowPrivateAccess" is needed to access private variables from Blueprints.
 	// ...
+
 	/// Simple collision shape for our pawn.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
 	UCapsuleComponent* Capsule;
@@ -37,5 +38,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
 	// ...
+
+
+protected:
+	void RotateTurret(FVector LookAtTarget);
+	void Fire();
+	// To be overridden in any child classes.
+	virtual void HandleDestruction();
 
 };

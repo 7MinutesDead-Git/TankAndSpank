@@ -34,6 +34,16 @@ protected:
 
 private:
 	// -----------------------------------------------------
+	void MoveTank(float Input);
+	void RotateTank(float Input);
+	FVector MoveDirection;
+	FQuat RotationDirection;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
+	float MoveSpeed = 1000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
+	float TurnSpeed = 300;
+
 	/// The Spring Arm Component for our Camera.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArm;
