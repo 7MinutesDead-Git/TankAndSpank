@@ -8,6 +8,11 @@
 #include "GameFramework/Pawn.h"
 #include "PawnBase.generated.h"
 
+// -------------------------------------------------------------------------------------------
+// Forward declarations.
+class APawnTank;
+
+// -------------------------------------------------------------------------------------------
 /// This is the base class for our pawns (both the tank and the immobile turrets).
 UCLASS()
 class TOONTANKS_API APawnBase : public APawn
@@ -15,10 +20,12 @@ class TOONTANKS_API APawnBase : public APawn
 	GENERATED_BODY()
 
 public:
+	// ---------------------------------------------------------
 	/// Sets default values for this pawn's properties.
 	APawnBase();
 
 private:
+	// ---------------------------------------------------------
 	// "AllowPrivateAccess" is needed to access private variables from Blueprints.
 	// ...
 
@@ -41,9 +48,9 @@ private:
 
 
 protected:
+	// ---------------------------------------------------------
 	void RotateTurret(FVector LookAtTarget);
 	void Fire();
 	// To be overridden in any child classes.
 	virtual void HandleDestruction();
-
 };

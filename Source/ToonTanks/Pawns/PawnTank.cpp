@@ -7,7 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
-// -----------------------------------------------------
+// -------------------------------------------------------------------------------------------
 APawnTank::APawnTank()
 {
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Spring Arm"));
@@ -16,13 +16,13 @@ APawnTank::APawnTank()
 	Camera->SetupAttachment(SpringArm);
 }
 
-// -----------------------------------------------------
+// -------------------------------------------------------------------------------------------
 void APawnTank::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-// -----------------------------------------------------
+// -------------------------------------------------------------------------------------------
 void APawnTank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -30,9 +30,8 @@ void APawnTank::Tick(float DeltaTime)
 }
 
 
-// -----------------------------------------------------
-// Technically this method has it's own tick component,
-// it just sends a 0 value when not pressing anything.
+// -------------------------------------------------------------------------------------------
+// Technically this method has it's own tick component, it just sends a 0 value when not pressing anything.
 void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -40,7 +39,7 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("TurnRightAndLeft", this, &APawnTank::RotateTank);
 }
 
-// -----------------------------------------------------
+// -------------------------------------------------------------------------------------------
 /// Determine move speed and direction on x-axis (forward or back). Update MoveDirection.
 void APawnTank::MoveTank(float Input)
 {
@@ -53,7 +52,7 @@ void APawnTank::MoveTank(float Input)
 	AddActorLocalOffset(MoveDirection, true);
 }
 
-// -----------------------------------------------------
+// -------------------------------------------------------------------------------------------
 /// Determine rotation speed and direction on y-axis (spinning/yaw). Update RotationDirection.
 void APawnTank::RotateTank(float Input)
 {
