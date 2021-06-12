@@ -9,6 +9,8 @@
 // -------------------------------------------------------------------------------------------
 // Forward declarations.
 class APawnTank;
+class USpringArmComponent;
+class UCameraComponent;
 
 // -------------------------------------------------------------------------------------------
 /**
@@ -31,7 +33,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat", meta=(AllowPrivateAccess = "true"))
 	float FireRate = 2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat", meta=(AllowPrivateAccess = "true"))
-	float ThreatRange = 500;
+	float ThreatRange = 2500;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat", meta=(AllowPrivateAccess = "true"))
 	bool EnableDebug = false;
 
@@ -46,7 +48,7 @@ private:
 	void CheckFireCondition();
 	void CreateFireRateTimer();
 	float DistanceToPlayer();
-	APawnTank* GetPlayerPawn();
+	APawnTank* GetPlayerPawnTank();
 
 protected:
 	// ---------------------------------------------------------

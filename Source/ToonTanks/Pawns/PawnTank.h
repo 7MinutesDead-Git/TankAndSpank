@@ -31,18 +31,27 @@ protected:
 	// ---------------------------------------------------------
 	/// Called when the game starts or when spawned.
 	virtual void BeginPlay() override;
+	virtual void HandleDestruction() override;
 
 private:
 	// ---------------------------------------------------------
 	void MoveTank(float Input);
 	void RotateTank(float Input);
+	void LookAtMouse();
+	/// Alternative to aiming at cursor.
+	void RotateView(float Input);
+
 	FVector MoveDirection;
 	FQuat RotationDirection;
+
+	APlayerController* PlayerController;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
 	float MoveSpeed = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
 	float TurnSpeed = 300;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
+	float MouseSensitivity = 100;
 
 	/// The Spring Arm Component for our Camera.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))

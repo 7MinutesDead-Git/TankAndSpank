@@ -11,7 +11,7 @@
 APawnTank::APawnTank()
 {
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Spring Arm"));
-	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->SetupAttachment(TurretMesh);
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 }
@@ -20,12 +20,26 @@ APawnTank::APawnTank()
 void APawnTank::BeginPlay()
 {
 	Super::BeginPlay();
+	// Get the controller of the tank pawn, and cast it to PlayerController type,
+	// so we can reference it later.
+	PlayerController = Cast<APlayerController>(GetController());
+}
+
+// -------------------------------------------------------------------------------------------
+void APawnTank::HandleDestruction()
+{
+	Super::HandleDestruction();
+	// Hide Player. TODO: Create function for this.
 }
 
 // -------------------------------------------------------------------------------------------
 void APawnTank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (PlayerController) {
+		// LookAtMouse();
+	}
 
 }
 
@@ -37,6 +51,8 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForwardAndBack", this, &APawnTank::MoveTank);
 	PlayerInputComponent->BindAxis("TurnRightAndLeft", this, &APawnTank::RotateTank);
+	PlayerInputComponent->BindAxis("RotateTurret", this, &APawnTank::RotateView);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
 }
 
 // -------------------------------------------------------------------------------------------
@@ -61,6 +77,39 @@ void APawnTank::RotateTank(float Input)
 	float Roll = 0;
 
 	FRotator Rotation = FRotator(Pitch, Yaw, Roll);
+	FRotator CounterRotation = FRotator(Pitch, -Yaw, Roll);
+
 	RotationDirection = FQuat(Rotation);
 	AddActorLocalRotation(RotationDirection, true);
+
+	// Counter rotate the turret so the view stays the same.
+	TurretMesh->AddLocalRotation(CounterRotation, false);
+}
+
+// -------------------------------------------------------------------------------------------
+/// Aim the tank turret towards the mouse cursor location via RotateTurret().
+void APawnTank::LookAtMouse()
+{
+	if (PlayerController) {
+		FHitResult CursorHit;
+		// This traces from the cursor to the world space. (cool!)
+		PlayerController->GetHitResultUnderCursor(
+			ECC_Visibility,		// The trace channel (in this case, anything visible).
+			false,				// Use complex tracing? No need for subpart hit detection.. yet.
+			OUT CursorHit		// OUT to FHitResult.
+			);
+		// This is the end location we want our tank turret to look at.
+		FVector HitLocation = CursorHit.Location;
+		RotateTurret(HitLocation);
+
+	}
+}
+
+// -------------------------------------------------------------------------------------------
+/// Rotate turret with mouse (alternative to aiming at cursor).
+void APawnTank::RotateView(float Input)
+{
+	FRotator Rotation = TurretMesh->GetRelativeRotation();
+	Rotation.Yaw += Input * MouseSensitivity * GetWorld()->DeltaTimeSeconds;
+	TurretMesh->SetRelativeRotation(Rotation);
 }

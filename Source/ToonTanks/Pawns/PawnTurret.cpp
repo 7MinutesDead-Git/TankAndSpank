@@ -29,7 +29,7 @@ void APawnTurret::BeginPlay()
 
 	// This will start the FireRateTimerHandle, which fires off every "FireRate" seconds.
 	CreateFireRateTimer();
-	PlayerPawn = GetPlayerPawn();
+	PlayerPawn = GetPlayerPawnTank();
 }
 
 // -------------------------------------------------------------------------------------------
@@ -113,8 +113,8 @@ float APawnTurret::DistanceToPlayer()
 }
 
 // -------------------------------------------------------------------------------------------
-// Retrieve player pawn at 0 index (Player One). Return as PawnTank reference.
-APawnTank* APawnTurret::GetPlayerPawn()
+/// Retrieve player pawn at 0 index (Player One). Return as PawnTank reference.
+APawnTank* APawnTurret::GetPlayerPawnTank()
 {
 	// This retrieves our player pawn at 0 index (player 1), and stores it as a APawnTank class (converted with a Cast).
 	// See above notes why we have to pass in "this".
