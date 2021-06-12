@@ -22,25 +22,28 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovement->MaxSpeed = MoveSpeedMax;
 	InitialLifeSpan = LifeSpan;
 
-	// TODO: If this doesn't work, either remake the Blueprint, or move this to BeginPlay().
+	// Bind "OnComponentHit" to "OnHit()" function, so OnHit is called any time this component is hit.
+	// OnComponentHit is an event, so when it fires off, it'll call OnHit.
+	// TODO: If this doesn't work, either recreate the Blueprint or move this to BeginPlay().
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectileBase::OnHit);
 
 }
 
+/// When this actor hits another actor. Handles damage, type, etc.
 void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
-	AActor* Owner = GetOwner();
+	AActor* MyOwner = GetOwner();
 
-	if (!Owner) {
+	if (!MyOwner) {
 		return;
 	}
 
 	// If we hit a valid actor that isn't itself nor the owning pawn:
-	if (OtherActor && OtherActor != this && OtherActor != Owner) {
-		AController* InstigatorController = Owner->GetInstigatorController();
+	if (OtherActor && OtherActor != this && OtherActor != MyOwner) {
+		AController* InstigatorController = MyOwner->GetInstigatorController();
 
-		// Method 1:
+		// Generate and apply the damage.
 		UGameplayStatics::ApplyDamage(
 			OtherActor,				// Actor that will be damaged.
 			Damage,					// Damage amount.
@@ -57,10 +60,25 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		// 	InstigatorController,	// Which player instigated it.
 		// 	this					// What actor caused the damage.
 		// 	);
+
+		// // Debug notifications.
+		// UE_LOG(LogTemp, Warning,
+		// 	TEXT("%s hit %s for %f damage!"),
+		// 	*InstigatorController->GetName(),
+		// 	*OtherActor->GetName(),
+		// 	Damage
+		// 	);
 	}
 
-	// Once everything is done, the projectile can be deleted.
-	Destroy();
+	// Then destroy the projectile after LifeSpan seconds, via a Timer (aka Delay :D).
+	FTimerManager& DestroyTimer = GetWorld()->GetTimerManager();
+	DestroyTimer.SetTimer(
+		OUT ExplosionTimerHandle,
+		this,
+		&AProjectileBase::DestroyProjectile,
+		LifeSpan,
+		false
+		);
 
 }
 
@@ -69,4 +87,9 @@ void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AProjectileBase::DestroyProjectile()
+{
+	Destroy();
 }

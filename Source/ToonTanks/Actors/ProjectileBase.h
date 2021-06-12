@@ -30,10 +30,10 @@ private:
 	 *   this event will receive it, and then be able to take action or call
 	 *   their own function based on that event.
 	 *
-	 * Dynamic Delegates need to be created as UFUNCTIONS.
+	 * Dynamic Delegates need to be created as UFUNCTION.
 	 *
-	 * UFUNCTIONS are the same as C++ functions, with a few differences.
-	 *	- Can be called or overridden from within Blueprints Visual Scripting.
+	 * UFUNCTION is the same as C++ functions, with a few differences.
+	 *	- Can be called or overridden from within Blueprints Visual Scripting,
 	 *		/w parameters: BlueprintCallable, BlueprintImplementableEvent, BlueprintPure.
 	 *
 	 *	- Can be assigned as delegates within the default properties of a class.
@@ -71,8 +71,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Damage", meta=(AllowPrivateAccess = "true"))
 	float Damage = 50;
 
+	FTimerHandle ExplosionTimerHandle;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void DestroyProjectile();
 
 };
