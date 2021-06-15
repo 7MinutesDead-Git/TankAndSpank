@@ -20,8 +20,8 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Health = DefaultHealth;
 
+	Health = DefaultHealth;
 	// A reference to our world's current active game mode, cast as GameModeBase class.
 	GameModeRef = Cast<ATankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	// Bind "OnTakeAnyDamage" event to our TakeDamage function.
@@ -42,6 +42,7 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 
 	// Clamp here ensures we can't have negative health, or more health than DefaultHealth.
 	Health = FMath::Clamp(Health - Damage, 0.f, DefaultHealth);
+	UE_LOG(LogTemp, Warning, TEXT("%s Health: %f"), *GetOwner()->GetName(), Health);
 
 	// Death condition.
 	if (Health <= 0) {
@@ -50,7 +51,6 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 			UE_LOG(LogTemp, Error, TEXT("Unable to report death of actor %s to GameMode."), *GetOwner()->GetName());
 			return;
 		}
-
 		// Tell our GameMode this actor died.
 		GameModeRef->ActorDied(GetOwner());
 	}

@@ -23,13 +23,15 @@ void APawnTank::BeginPlay()
 	// Get the controller of the tank pawn, and cast it to PlayerController type,
 	// so we can reference it later.
 	PlayerController = Cast<APlayerController>(GetController());
+
+	CreateFireRateTimer();
 }
 
 // -------------------------------------------------------------------------------------------
 void APawnTank::HandleDestruction()
 {
 	Super::HandleDestruction();
-	// Hide Player. TODO: Create function for this.
+	Destroy();
 }
 
 // -------------------------------------------------------------------------------------------
@@ -52,7 +54,8 @@ void APawnTank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveForwardAndBack", this, &APawnTank::MoveTank);
 	PlayerInputComponent->BindAxis("TurnRightAndLeft", this, &APawnTank::RotateTank);
 	PlayerInputComponent->BindAxis("RotateTurret", this, &APawnTank::RotateView);
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APawnTank::FireToggle);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &APawnTank::FireToggle);
 }
 
 // -------------------------------------------------------------------------------------------
@@ -112,4 +115,39 @@ void APawnTank::RotateView(float Input)
 	FRotator Rotation = TurretMesh->GetRelativeRotation();
 	Rotation.Yaw += Input * MouseSensitivity * GetWorld()->DeltaTimeSeconds;
 	TurretMesh->SetRelativeRotation(Rotation);
+}
+
+// -------------------------------------------------------------------------------------------
+/// Create a timer that will dictate the player's fire rate.\n\n <b>OUT</b> to <i>FireRateTimerHandle</i>.
+void APawnTank::CreateFireRateTimer()
+{
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+
+	TimerManager.SetTimer(
+		OUT FireRateTimerHandle,		  // OUT to our Timer Handle (the thing that will be handling this timer).
+		this,							  // Reference to this class.
+		&APawnTank::CheckFireCondition,   // The memory location of the function we'll be firing off.
+		FireRate,						  // The amount of time (in seconds) between set and firing.
+		true							  // Keep looping/firing at our set FireRate intervals.
+		);
+}
+
+// -------------------------------------------------------------------------------------------
+/// If IsFiring is set to true then we'll keep shooting as fast as the FireRateTimer wants us to.
+void APawnTank::CheckFireCondition()
+{
+	if (IsFiring)
+		Fire();
+}
+
+// -------------------------------------------------------------------------------------------
+/// Toggle IsFiring bool. Only ever called on press and on release from "Fire" input.
+void APawnTank::FireToggle()
+{
+	if (!IsFiring) {
+		IsFiring = true;
+	}
+	else if (IsFiring) {
+		IsFiring = false;
+	}
 }

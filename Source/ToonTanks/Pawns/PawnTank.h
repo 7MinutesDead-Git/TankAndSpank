@@ -26,12 +26,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	/// Called to bind functionality to input.
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void HandleDestruction() override;
 
 protected:
 	// ---------------------------------------------------------
 	/// Called when the game starts or when spawned.
 	virtual void BeginPlay() override;
-	virtual void HandleDestruction() override;
 
 private:
 	// ---------------------------------------------------------
@@ -40,9 +40,15 @@ private:
 	void LookAtMouse();
 	/// Alternative to aiming at cursor.
 	void RotateView(float Input);
+	void CreateFireRateTimer();
+	void CheckFireCondition();
+	void FireToggle();
+
+	bool IsFiring = false;
 
 	FVector MoveDirection;
 	FQuat RotationDirection;
+	FTimerHandle FireRateTimerHandle;
 
 	APlayerController* PlayerController;
 
@@ -52,6 +58,11 @@ private:
 	float TurnSpeed = 300;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
 	float MouseSensitivity = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat", meta=(AllowPrivateAccess = "true"))
+	/// Lower is faster.
+	float FireRate = 0.5;
+
 
 	/// The Spring Arm Component for our Camera.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))

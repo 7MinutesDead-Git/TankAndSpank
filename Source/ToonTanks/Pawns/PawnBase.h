@@ -24,6 +24,8 @@ public:
 	// ---------------------------------------------------------
 	/// Sets default values for this pawn's properties.
 	APawnBase();
+	// To be overridden in any child classes.
+	virtual void HandleDestruction();
 
 private:
 	// ---------------------------------------------------------
@@ -57,6 +59,4 @@ protected:
 	// ---------------------------------------------------------
 	void RotateTurret(FVector LookAtTarget);
 	void Fire();
-	// To be overridden in any child classes.
-	virtual void HandleDestruction();
 };
