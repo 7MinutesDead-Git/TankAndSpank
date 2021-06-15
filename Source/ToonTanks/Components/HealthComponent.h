@@ -30,8 +30,15 @@ private:
 	float DefaultHealth = 200;
 	float Health = 0;
 
+	UPROPERTY()
 	ATankGameModeBase* GameModeRef;
 
 	UFUNCTION()
-	void TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* Instigator, AActor* DamageCauser);
+	void TakeDamage(
+		AActor* DamagedActor,
+		float Damage,
+		const UDamageType* DamageType,
+		AController* Instigator,
+		AActor* DamageCauser
+		);
 };

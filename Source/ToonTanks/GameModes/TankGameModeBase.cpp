@@ -11,6 +11,7 @@ void ATankGameModeBase::BeginPlay()
 /// What to do with dead actors (player or NPC).
 void ATankGameModeBase::ActorDied(AActor* DeadActor)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Actor %s died! Bye-bye."), *DeadActor->GetName());
 	// Check what type of Actor died.
 	// - If turret, up difficulty, spawn items, etc.
 	// - If player, go to lose condition.
