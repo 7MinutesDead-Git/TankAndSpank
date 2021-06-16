@@ -86,6 +86,8 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	if (IsTurret || IsTank && OtherActor != GetOwner()) {
 		// Play hit particle.
 		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
+		// PLay metal impact sound when hit directly.
+		PlaySoundNoSpam(DirectImpactSound);
 
 		// Generate and apply the damage.
 		UGameplayStatics::ApplyDamage(
@@ -97,14 +99,13 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 			);
 	}
 
-	// Play hit sound whenever we bounce off anything.
-	// This is so the hit sound doesn't spam when rolling against the ground.
-	WorldTime = UGameplayStatics::GetTimeSeconds(GetWorld());
-	float SoundTimeDiff = WorldTime - TimeHitSoundPlayed;
-	if (SoundTimeDiff >= 1) {
-		TimeHitSoundPlayed = WorldTime;
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+	// Shake Camera if it's the player hit.
+	if (IsTank) {
+		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitShake, HitShakeScale);
 	}
+
+	// Play this sound whenever we bounce off anything.
+	PlaySoundNoSpam(ImpactSound);
 
 	// Then explode the grenade after ExplosionTimer seconds, via a Timer.
 	FTimerManager& DestroyTimer = GetWorld()->GetTimerManager();
@@ -116,7 +117,18 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		ExplosionTimer,
 		false
 		);
+}
 
+/// Play sound effect at location, with a cooldown.
+void AProjectileBase::PlaySoundNoSpam(USoundBase* SoundToPlay)
+{
+	// This is so the hit sound doesn't spam when rolling against the ground.
+	WorldTime = UGameplayStatics::GetTimeSeconds(GetWorld());
+	float Cooldown = WorldTime - TimeHitSoundPlayed;
+	if (Cooldown >= 1) {
+		TimeHitSoundPlayed = WorldTime;
+		UGameplayStatics::PlaySoundAtLocation(this, SoundToPlay, GetActorLocation());
+	}
 }
 
 // Called when the game starts or when spawned.

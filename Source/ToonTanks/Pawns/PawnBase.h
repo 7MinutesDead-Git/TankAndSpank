@@ -51,6 +51,15 @@ private:
 
 
 protected:
+	void ShakeCamera(TSubclassOf<UMatineeCameraShake> ShakeType);
+	// UMatineeCameraShake is a legacy Camera Shake. The new one is CameraShakeBase.
+	UPROPERTY(EditAnywhere, Category="Effects")
+	TSubclassOf<UMatineeCameraShake> DeathShake;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	TSubclassOf<UMatineeCameraShake> ShotShake;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	float CameraShakeScale = 1;
+
 	// ---------------------------------------------------------
 	/// Simple collision shape for our pawn.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
@@ -66,5 +75,5 @@ protected:
 
 	// ---------------------------------------------------------
 	void RotateTurret(FVector LookAtTarget);
-	void Fire();
+	virtual void Fire();
 };

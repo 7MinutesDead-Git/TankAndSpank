@@ -77,7 +77,16 @@ private:
 	// See notes above about UFUNCTIONS and Delegates for working with Events.
 	/// Will be a Dynamic Delegate. Used to handle our OnComponentHit info for damage, destruction, etc. \n
 	/// Parameters determined by parameters accessible from OnComponentHit event.
-	UFUNCTION() void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnHit(
+		UPrimitiveComponent* HitComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit
+		);
+
+	void PlaySoundNoSpam(USoundBase* SoundToPlay);
 
 	// -----------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, Category="Effects")
@@ -87,29 +96,57 @@ private:
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* ImpactSound;
 	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* DirectImpactSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* LaunchSound;
 	UPROPERTY(EditAnywhere, Category="Effects")
 	USoundBase* ExplosionSound;
-
 	float WorldTime;
 	float TimeHitSoundPlayed = 0;
 
+	// UMatineeCameraShake is a legacy Camera Shake. The new one is CameraShakeBase.
+	UPROPERTY(EditAnywhere, Category="Effects")
+	TSubclassOf<UMatineeCameraShake> HitShake;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	float HitShakeScale = 1;
+
+
 	// -----------------------------------------------------------------------
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category="Components",
+		meta=(AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category="Components",
+		meta=(AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ProjectileMesh;
 
 	// -----------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadOnly,
+		Category="Movement",
+		meta=(AllowPrivateAccess = "true"))
 	float MoveSpeedStart = 500;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadOnly,
+		Category="Movement",
+		meta=(AllowPrivateAccess = "true"))
 	float MoveSpeedMax = 3000;
 
 	// -----------------------------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Life", meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadOnly,
+		Category="Life",
+		meta=(AllowPrivateAccess = "true"))
 	float LifeSpan = 5;
 	float ExplosionTimer = LifeSpan / 2;
 
@@ -118,7 +155,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Damage")
 	TSubclassOf<UDamageType> DamageType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Damage", meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(
+		EditAnywhere,
+		BlueprintReadOnly,
+		Category="Damage",
+		meta=(AllowPrivateAccess = "true"))
 	float Damage = 50;
 
 	// -----------------------------------------------------------------------

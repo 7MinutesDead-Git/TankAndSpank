@@ -42,10 +42,8 @@ void APawnBase::RotateTurret(FVector LookAtTarget)
 	float TurretZ = TurretMesh->GetComponentLocation().Z;
 	// SafeLookTarget could either be the mouse cursor (for the player), or the tank (for the turrets).
 	FVector SafeLookTarget = FVector(LookAtTarget.X, LookAtTarget.Y, TurretZ);
-
 	// Then we want to subtract this from the turret's own location to get the look direction.
 	FVector SafeLookDirection = SafeLookTarget - TurretMesh->GetComponentLocation();
-
 	// Then finally we convert that SafeLookDirection vector into a rotation, to rotate the turret.
 	FRotator TurretRotation = SafeLookDirection.Rotation();
 	TurretMesh->SetWorldRotation(TurretRotation);
@@ -75,7 +73,8 @@ void APawnBase::HandleDestruction()
 	// Spawns death particle at actor location.
 	UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticle, GetActorLocation());
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
-
+	// Shake camera!
+	ShakeCamera(DeathShake);
 	/*
 		Child Class overrides:
 			- In PawnTurret:
@@ -86,4 +85,10 @@ void APawnBase::HandleDestruction()
 				Hide() all of its components.
 				Stop movement.
 	*/
+}
+
+/// Shake the camera for the FirstPLayerController given the type of BP_Shake we want to use.
+void APawnBase::ShakeCamera(TSubclassOf<UMatineeCameraShake> ShakeType)
+{
+	GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(ShakeType, CameraShakeScale);
 }

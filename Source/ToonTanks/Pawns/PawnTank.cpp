@@ -162,3 +162,12 @@ void APawnTank::FireToggle()
 		IsFiring = false;
 	}
 }
+
+
+/// Override for Tank-specific functionality like camera shake.
+void APawnTank::Fire()
+{
+	Super::Fire();
+	// Shake camera when firing.
+	ShakeCamera(ShotShake);
+}

@@ -48,6 +48,7 @@ private:
 	void CreateFireRateTimer();
 	void CheckFireCondition();
 	void FireToggle();
+	virtual void Fire() override;
 
 	bool IsFiring = false;
 	bool PlayerAlive = true;
