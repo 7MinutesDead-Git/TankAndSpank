@@ -79,33 +79,55 @@ private:
 	/// Parameters determined by parameters accessible from OnComponentHit event.
 	UFUNCTION() void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	// -----------------------------------------------------------------------
+	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* ExplosionParticle;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* HitParticle;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* ImpactSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* LaunchSound;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* ExplosionSound;
+
+	float WorldTime;
+	float TimeHitSoundPlayed = 0;
+
+	// -----------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ProjectileMesh;
 
-	// See notes up top about TSubclassOf.
-	UPROPERTY(EditDefaultsOnly, Category="Damage")
-	TSubclassOf<UDamageType> DamageType;
-
+	// -----------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = "true"))
 	float MoveSpeedStart = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Movement", meta=(AllowPrivateAccess = "true"))
 	float MoveSpeedMax = 3000;
 
+	// -----------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Life", meta=(AllowPrivateAccess = "true"))
-	float LifeSpan = 10;
+	float LifeSpan = 5;
+	float ExplosionTimer = LifeSpan / 2;
+
+	// -----------------------------------------------------------------------
+	// See notes up top about TSubclassOf.
+	UPROPERTY(EditDefaultsOnly, Category="Damage")
+	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Damage", meta=(AllowPrivateAccess = "true"))
 	float Damage = 50;
 
+	// -----------------------------------------------------------------------
 	FTimerHandle ExplosionTimerHandle;
+	bool IsTurret = false;
+	bool IsTank = false;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void DestroyProjectile();
-
 };

@@ -39,7 +39,6 @@ void APawnTurret::HandleDestruction()
 	// Call base pawn first to play effects,
 	// then we can do the rest of override logic specific to the turret.
 	Super::HandleDestruction();
-
 	Destroy();
 }
 
@@ -47,12 +46,10 @@ void APawnTurret::HandleDestruction()
 void APawnTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	// If there is no player, or the player is out of range, do nothing.
 	if (!PlayerPawn || DistanceToPlayer() > ThreatRange) {
 		return;
 	}
-
 	// Otherwise, move our turret head's aim/rotation towards the Player.
 	RotateTurret(PlayerPawn->GetActorLocation());
 
@@ -67,12 +64,12 @@ void APawnTurret::CheckFireCondition()
 		DrawDebugSphere(GetWorld(), GetActorLocation(), ThreatRange, 8, Blue, false, 2, 0, 1);
 	}
 
-	// If the player doesn't exist, return.
-	if (!PlayerPawn) {
+	// If the player doesn't exist or is dead, return.
+	if (!PlayerPawn || !PlayerPawn->IsPlayerAlive() ) {
 		return;
 	}
 
-	// If they're in range, fire!
+	// If they're alive and in range, fire!
 	if (DistanceToPlayer() <= ThreatRange) {
 		Fire();
 	}

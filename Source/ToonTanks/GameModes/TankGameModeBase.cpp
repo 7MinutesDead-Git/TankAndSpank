@@ -15,15 +15,13 @@
 #include "ToonTanks/Pawns/PawnTank.h"
 #include "ToonTanks/Pawns/PawnTurret.h"
 #include "Kismet/GameplayStatics.h"
+#include "ToonTanks/PlayerControllers/PlayerControllerBase.h"
 
 
 // -------------------------------------------------------------------------------------------
 void ATankGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UpdateTurretsAlive();
-	PlayerTank = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
 	HandleGameStart();
 }
 
@@ -37,6 +35,10 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 	if (DeadActor == PlayerTank) {
 		PlayerTank->HandleDestruction();
 		HandleGameOver(false);
+
+		if (PlayerControllerRef) {
+			PlayerControllerRef->SetPlayerEnabledState(false);
+		}
 	}
 	// If a turret died, then we go here.
 	else if (APawnTurret* DestroyedTurret = Cast<APawnTurret>(DeadActor)) {
@@ -53,7 +55,29 @@ void ATankGameModeBase::ActorDied(AActor* DeadActor)
 /// Call the GameStart() Blueprint function.
 void ATankGameModeBase::HandleGameStart()
 {
+	UpdateTurretsAlive();
+	PlayerTank = Cast<APawnTank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	PlayerControllerRef = Cast<APlayerControllerBase>(UGameplayStatics::GetPlayerController(this, 0));
 	GameStart();
+
+	// To make sure the player can't move during countdown.
+	if (PlayerControllerRef) {
+		PlayerControllerRef->SetPlayerEnabledState(false);
+
+		FTimerHandle PlayerEnableHandle;
+		// TODO: I don't understand this at all.
+		FTimerDelegate PlayerEnableDelegate = FTimerDelegate::CreateUObject(
+			PlayerControllerRef,
+			&APlayerControllerBase::SetPlayerEnabledState,
+			true);
+
+		GetWorld()->GetTimerManager().SetTimer(
+			PlayerEnableHandle,
+			PlayerEnableDelegate,
+			StartDelay-1,	// -1 So we can start moving when it says "GO".
+			false);
+
+	}
 }
 
 // -------------------------------------------------------------------------------------------
@@ -71,6 +95,5 @@ void ATankGameModeBase::UpdateTurretsAlive()
 	UGameplayStatics::GetAllActorsOfClass(
 		GetWorld(),						// World context.
 		APawnTurret::StaticClass(),		// Class of actor we're looking for. See notes at top.
-		OUT Turrets						// Where to store the result.
-		);
+		OUT Turrets);					// Where to store the result.
 }

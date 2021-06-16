@@ -31,7 +31,18 @@ void APawnTank::BeginPlay()
 void APawnTank::HandleDestruction()
 {
 	Super::HandleDestruction();
-	Destroy();
+	PlayerAlive = false;
+
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+
+}
+
+// -------------------------------------------------------------------------------------------
+/// Return whether player is alive or not.
+bool APawnTank::IsPlayerAlive()
+{
+	return PlayerAlive;
 }
 
 // -------------------------------------------------------------------------------------------
@@ -136,7 +147,7 @@ void APawnTank::CreateFireRateTimer()
 /// If IsFiring is set to true then we'll keep shooting as fast as the FireRateTimer wants us to.
 void APawnTank::CheckFireCondition()
 {
-	if (IsFiring)
+	if (IsFiring && PlayerAlive)
 		Fire();
 }
 

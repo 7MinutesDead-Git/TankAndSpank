@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "TankGameModeBase.generated.h"
+#include "ToonTanks/PlayerControllers/PlayerControllerBase.h"
 
-/**
- *
- */
+#include "TankGameModeBase.generated.h"
 
 // -------------------------------------------------------------------------------------------
 // Forward declarations.
@@ -30,6 +28,8 @@ private:
 	APawnTank* PlayerTank;
 	UPROPERTY()
 	TArray<AActor*> Turrets;
+	UPROPERTY()
+	APlayerControllerBase* PlayerControllerRef;
 	void HandleGameStart();
 	void HandleGameOver(bool PlayerWon);
 	void UpdateTurretsAlive();
@@ -43,11 +43,9 @@ protected:
 	// The following UFUNCTIONs mean we'll be able to implement these functions in Blueprints.
 	// Certain things like setting timers and creating widgets are much faster and easier in BP.
 
-	/// Imeplementable event/method in Blueprints!
 	UFUNCTION(BlueprintImplementableEvent)
 	void GameStart();
 
-	/// Imeplementable event/method in Blueprints!
 	UFUNCTION(BlueprintImplementableEvent)
 	void GameOver(bool PlayerWon);
 };

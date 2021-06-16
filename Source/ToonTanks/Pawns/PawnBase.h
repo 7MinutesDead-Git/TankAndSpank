@@ -12,6 +12,7 @@
 // Forward declarations.
 class APawnTank;
 class AProjectileBase;
+class UHealthComponent;
 
 // -------------------------------------------------------------------------------------------
 /// This is the base class for our pawns (both the tank and the immobile turrets).
@@ -29,8 +30,12 @@ public:
 
 private:
 	// ---------------------------------------------------------
-	// "AllowPrivateAccess" is needed to access private variables from Blueprints.
+	UPROPERTY(EditAnywhere, Category="Effects")
+	UParticleSystem* DeathParticle;
+	UPROPERTY(EditAnywhere, Category="Effects")
+	USoundBase* ExplosionSound;
 
+	// "AllowPrivateAccess" is needed to access private variables from Blueprints.
 	/// Acts as visual representation for where to spawn the projectile from.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawnPoint;
@@ -40,6 +45,9 @@ private:
 	/// AProjectileBase classes to fill this variable, including the derived BPs we might make from it.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Projectile Type", meta= (AllowPrivateAccess = "true"))
 	TSubclassOf<AProjectileBase> ProjectileClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
 
 
 protected:

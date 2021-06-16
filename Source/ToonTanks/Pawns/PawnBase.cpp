@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "ToonTanks/Actors/ProjectileBase.h"
+#include "ToonTanks/Components/HealthComponent.h"
 
 // -------------------------------------------------------------------------------------------
 APawnBase::APawnBase()
@@ -26,6 +27,9 @@ APawnBase::APawnBase()
 
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
+
+	// Not a physical object so no need to attach to anything.
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 }
 
 // -------------------------------------------------------------------------------------------
@@ -68,10 +72,11 @@ void APawnBase::Fire()
 /// Visualize destruction, inform GameMode of pawn death, etc.
 void APawnBase::HandleDestruction()
 {
-	/*
-	    Base Class:
-			- Visualize destruction (particles, sound, camera shake).
+	// Spawns death particle at actor location.
+	UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticle, GetActorLocation());
+	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 
+	/*
 		Child Class overrides:
 			- In PawnTurret:
 				Inform GameMode it died.

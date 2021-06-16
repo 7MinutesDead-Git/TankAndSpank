@@ -28,6 +28,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void HandleDestruction() override;
 
+	/* Making this function public allows any class to check if the player is alive,
+	 * without needing to expose the actual "IsPlayerAlive" variable, to avoid
+	 * accidentally setting it externally. So, "get" is public, but "set" is private. */
+	bool IsPlayerAlive();
+
 protected:
 	// ---------------------------------------------------------
 	/// Called when the game starts or when spawned.
@@ -45,6 +50,7 @@ private:
 	void FireToggle();
 
 	bool IsFiring = false;
+	bool PlayerAlive = true;
 
 	FVector MoveDirection;
 	FQuat RotationDirection;
@@ -55,9 +61,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
 	float MoveSpeed = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
-	float TurnSpeed = 300;
+	float TurnSpeed = 200;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement", meta=(AllowPrivateAccess = "true"))
-	float MouseSensitivity = 100;
+	float MouseSensitivity = 150;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat", meta=(AllowPrivateAccess = "true"))
 	/// Lower is faster.

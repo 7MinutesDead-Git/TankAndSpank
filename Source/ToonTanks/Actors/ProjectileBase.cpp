@@ -38,6 +38,8 @@
 #include "Projects.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "ToonTanks/Pawns/PawnTank.h"
+#include "ToonTanks/Pawns/PawnTurret.h"
 
 // Sets default values
 AProjectileBase::AProjectileBase()
@@ -53,6 +55,7 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->InitialSpeed = MoveSpeedStart;
 	ProjectileMovement->MaxSpeed = MoveSpeedMax;
+	// How long the particle lives if nothing else destroys it before this.
 	InitialLifeSpan = LifeSpan;
 
 	// This binds "OnComponentHit" event to "OnHit()" function, so OnHit is called any time this component is hit.
@@ -72,41 +75,61 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		return;
 	}
 
-	// If we hit a valid actor that isn't itself nor the owning pawn:
-	if (OtherActor && OtherActor != this && OtherActor != MyOwner) {
-		AController* InstigatorController = MyOwner->GetInstigatorController();
+	// If we hit another actor:
+	if (OtherActor) {
+		// We can first check if the other actor is a PawnTurret or PawnTank, and save it as a bool.
+		IsTurret = OtherActor->GetClass()->IsChildOf(APawnTurret::StaticClass());
+		IsTank = OtherActor->GetClass()->IsChildOf(APawnTank::StaticClass());
+	}
+
+	// So if we hit a turret or the player, but not ourselves.
+	if (IsTurret || IsTank && OtherActor != GetOwner()) {
+		// Play hit particle.
+		UGameplayStatics::SpawnEmitterAtLocation(this, HitParticle, GetActorLocation());
 
 		// Generate and apply the damage.
 		UGameplayStatics::ApplyDamage(
-			OtherActor,				// Actor that will be damaged.
-			Damage,					// Damage amount.
-			InstigatorController,	// Which player instigated it.
-			this,					// What actor caused the damage.
-			DamageType				// Type of damage done.
+			OtherActor,							// Actor that will be damaged.
+			Damage,								// Damage amount.
+			MyOwner->GetInstigatorController(),	// Which player instigated it.
+			this,								// What actor caused the damage.
+			DamageType							// Type of damage done.
 			);
 	}
 
-	// Then destroy the projectile after LifeSpan seconds, via a Timer (aka Delay :D).
+	// Play hit sound whenever we bounce off anything.
+	// This is so the hit sound doesn't spam when rolling against the ground.
+	WorldTime = UGameplayStatics::GetTimeSeconds(GetWorld());
+	float SoundTimeDiff = WorldTime - TimeHitSoundPlayed;
+	if (SoundTimeDiff >= 1) {
+		TimeHitSoundPlayed = WorldTime;
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+	}
+
+	// Then explode the grenade after ExplosionTimer seconds, via a Timer.
 	FTimerManager& DestroyTimer = GetWorld()->GetTimerManager();
 
 	DestroyTimer.SetTimer(
 		OUT ExplosionTimerHandle,
 		this,
 		&AProjectileBase::DestroyProjectile,
-		LifeSpan,
+		ExplosionTimer,
 		false
 		);
 
 }
 
-// Called when the game starts or when spawned
+// Called when the game starts or when spawned.
 void AProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 }
 
+/// Play explosion particle effect then destroy this projectile.
 void AProjectileBase::DestroyProjectile()
 {
+	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticle, GetActorLocation());
 	Destroy();
 }
