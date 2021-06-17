@@ -35,7 +35,9 @@
 
 #include "ProjectileBase.h"
 
+#include "DrawDebugHelpers.h"
 #include "Projects.h"
+#include "Engine/TriggerSphere.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "ToonTanks/Pawns/PawnTank.h"
@@ -56,7 +58,7 @@ AProjectileBase::AProjectileBase()
 	ProjectileMovement->InitialSpeed = MoveSpeedStart;
 	ProjectileMovement->MaxSpeed = MoveSpeedMax;
 	// How long the particle lives if nothing else destroys it before this.
-	InitialLifeSpan = LifeSpan;
+	InitialLifeSpan = LifeSpan * 2;
 
 	// This binds "OnComponentHit" event to "OnHit()" function, so OnHit is called any time this component is hit.
 	// AddDynamic() is a helper macro that binds the event to the object and method we want to call.
@@ -97,20 +99,20 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 			this,								// What actor caused the damage.
 			DamageType							// Type of damage done.
 			);
+		DestroyProjectile();
 	}
 
 	// Shake Camera if it's the player hit.
 	if (IsTank) {
 		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitShake, HitShakeScale);
+		DestroyProjectile();
 	}
 
 	// Play this sound whenever we bounce off anything.
 	PlaySoundNoSpam(ImpactSound);
 
 	// Then explode the grenade after ExplosionTimer seconds, via a Timer.
-	FTimerManager& DestroyTimer = GetWorld()->GetTimerManager();
-
-	DestroyTimer.SetTimer(
+	GetWorld()->GetTimerManager().SetTimer(
 		OUT ExplosionTimerHandle,
 		this,
 		&AProjectileBase::DestroyProjectile,
@@ -143,5 +145,45 @@ void AProjectileBase::DestroyProjectile()
 {
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionParticle, GetActorLocation());
+
+	CreateExplosionImpulse(GetActorLocation());
+
 	Destroy();
+}
+
+/// Check for actors in radius of explosion and apply impulse. \n\n
+/// https://youtu.be/qDcUTDfkZes
+void AProjectileBase::CreateExplosionImpulse(FVector Location)
+{
+	// Create basic collision shape!
+	FCollisionShape Spherical = FCollisionShape::MakeSphere(ImpulseRadius);
+
+	// Do a sweep check in a radius with SweepMultiChannel().
+	bool SweepHit = GetWorld()->SweepMultiByChannel(
+		OUT HitResults,						// Our array of results.
+		GetActorLocation(),					// Start location.
+		GetActorLocation() * 1.01f,			// End location (has to be different than start).
+		FQuat::Identity,                    // Rotation (none needed, so blank FQuat).
+		ECC_WorldStatic,					// Collision channel.
+		Spherical							// Shape.
+		);
+
+	if (SweepHit) {
+		for (auto& Hit: HitResults) {
+			// First, see if the hit actor has a mesh component.
+			UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(Hit.GetActor()->GetRootComponent());
+			// If there is, we'll apply the radial impulse to it.
+			if (Mesh) {
+				// Grab the mass so we can use more reasonable force numbers.
+				float Mass = Mesh->GetMass();
+
+				Mesh->AddRadialImpulse(
+					GetActorLocation(),	 // Impulse Location.
+					ImpulseRadius,	     // Radius.
+					ImpulseForce * Mass, // Force.
+					RIF_Constant,	     // RIF (Radial Impact Force) falloff type.
+					false);
+			}
+		}
+	}
 }

@@ -56,3 +56,8 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 	}
 	// ...
 }
+
+float UHealthComponent::GetHealth()
+{
+	return Health;
+}

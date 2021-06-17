@@ -20,6 +20,8 @@ class TOONTANKS_API UHealthComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UHealthComponent();
+	UFUNCTION(BlueprintCallable)
+	float GetHealth();
 
 protected:
 	// Called when the game starts
@@ -27,7 +29,7 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere)
-	float DefaultHealth = 200;
+	float DefaultHealth = 9;
 	float Health = 0;
 
 	UPROPERTY()

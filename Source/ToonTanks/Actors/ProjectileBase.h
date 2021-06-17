@@ -62,6 +62,7 @@
 // -------------------------------------------------------------------------------------------
 // Forward declarations.
 class UProjectileMovementComponent;
+class ATriggerSphere;
 
 // -------------------------------------------------------------------------------------------
 UCLASS()
@@ -163,12 +164,25 @@ private:
 	float Damage = 50;
 
 	// -----------------------------------------------------------------------
+	UPROPERTY()
 	FTimerHandle ExplosionTimerHandle;
 	bool IsTurret = false;
 	bool IsTank = false;
+	UPROPERTY(EditAnywhere)
+	bool EnableDebugView;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	void DestroyProjectile();
+	void CreateExplosionImpulse(FVector Location);
+
+	// Radial Impulse.
+	UPROPERTY(EditAnywhere)
+	float ImpulseRadius = 500;
+	UPROPERTY(EditAnywhere)
+	float ImpulseForce = 2000;
+	UPROPERTY()
+	TArray<FHitResult> HitResults;
+
 };
