@@ -1,4 +1,4 @@
-# TankAndSpank
+# TankAndSpank with Popcorn Grenades
 The C++ classes for my implementation of ToonTanks.  
 
   
