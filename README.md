@@ -150,8 +150,7 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 }
 ```
 
-- And I added a radial impulse to the grenades when they explode, to cause all the other nearby projectiles to act as a shrapnel and bring the chaos up. I learned from another video by this section's teacher:  
-  https://www.youtube.com/watch?v=qDcUTDfkZes  
+- And I added a radial impulse to the grenades when they explode, to cause all the other nearby projectiles to act as a shrapnel and bring the chaos up:  
   
 ```cpp
 /// Check for actors in radius of explosion and apply impulse.
