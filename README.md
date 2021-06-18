@@ -120,11 +120,11 @@ void AProjectileBase::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 
 		// Generate and apply the damage.
 		UGameplayStatics::ApplyDamage(
-			OtherActor,							// Actor that will be damaged.
-			Damage,								// Damage amount.
+			OtherActor,				// Actor that will be damaged.
+			Damage,					// Damage amount.
 			MyOwner->GetInstigatorController(),	// Which player instigated it.
-			this,								// What actor caused the damage.
-			DamageType							// Type of damage done.
+			this,					// What actor caused the damage.
+			DamageType				// Type of damage done.
 			);
 		DestroyProjectile();
 	}
@@ -161,12 +161,12 @@ void AProjectileBase::CreateExplosionImpulse(FVector Location)
 
 	// Do a sweep check in a radius with SweepMultiChannel().
 	bool SweepHit = GetWorld()->SweepMultiByChannel(
-		OUT HitResults,						// Our array of results.
-		GetActorLocation(),					// Start location.
-		GetActorLocation() * 1.01f,			// End location (has to be different than start).
-		FQuat::Identity,                    // Rotation (none needed, so blank FQuat).
-		ECC_WorldStatic,					// Collision channel.
-		Spherical							// Shape.
+		OUT HitResults,			// Our array of results.
+		GetActorLocation(),		// Start location.
+		GetActorLocation() * 1.01f,	// End location (has to be different than start).
+		FQuat::Identity,                // Rotation (none needed, so blank FQuat).
+		ECC_WorldStatic,		// Collision channel.
+		Spherical			// Shape.
 		);
 
 	if (SweepHit) {
@@ -179,7 +179,7 @@ void AProjectileBase::CreateExplosionImpulse(FVector Location)
 				float Mass = Mesh->GetMass();
 
 				Mesh->AddRadialImpulse(
-					GetActorLocation(),	 // Impulse Location.
+					GetActorLocation(),  // Impulse Location.
 					ImpulseRadius,	     // Radius.
 					ImpulseForce * Mass, // Force.
 					RIF_Constant,	     // RIF (Radial Impact Force) falloff type.
